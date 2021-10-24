@@ -1,0 +1,48 @@
+function geraNumero() {
+  var spreadsheet = SpreadsheetApp.getActive();
+
+  var lastRow = spreadsheet.getLastRow();
+  var nextRow = lastRow + 1;
+  var currentTime = new Date();
+  var curDate = Utilities.formatDate(new Date(), "GMT+1", "dd/MM/yy")
+
+  // soma +1 no indice
+  var indice = spreadsheet.getRange("A" + (lastRow)).getValues();
+  indice++;
+  spreadsheet.getRange("A" + (nextRow)).setValue(indice);
+
+  if (indice.toString().length < 3){
+    indiceString = "0" + indice.toString();
+  };
+  if (indice.toString().length < 2){
+    indiceString = "00" + indice.toString();
+  };
+
+  // copia lista do tipo de decumento
+  spreadsheet.getRange("B" + (lastRow)).copyTo(spreadsheet.getRange("B" + nextRow),  {contentsOnly:false});
+  spreadsheet.getRange("B" + (lastRow + 1)).clear();
+
+  // copia formula geradora do código
+  spreadsheet.getRange("C" + (lastRow)).copyTo(spreadsheet.getRange("C" + nextRow),  {contentsOnly:false});
+
+  // monta o codigo do documento
+  var prefix = spreadsheet.getRange("C" + lastRow).getValues();
+
+  var monthString = (currentTime.getMonth() + 1).toString();
+  if (monthString.length < 2){
+    monthString = "0" + monthString;
+  };
+
+  var dayString = (currentTime.getDate() + 1).toString();
+  if (dayString.length < 2){
+    dayString = "0" + dayString;
+  };
+
+  var content = (currentTime.getFullYear() - 2000).toString() + monthString + dayString;
+  content = content + indiceString + prefix + "-0";
+  
+  spreadsheet.getRange("D" + lastRow).setValue(content); 
+  spreadsheet.getRange("E" + lastRow).setValue(currentTime);
+  spreadsheet.getRange("F" + lastRow).setValue("0");
+
+};
